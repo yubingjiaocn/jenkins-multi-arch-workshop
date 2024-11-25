@@ -65,8 +65,8 @@ pipeline {
               // Get ECR login password and create docker config
               sh """
                   mkdir -p /root/.docker && \
-                  export ECR_CRED=$(aws ecr get-login-password --region ${region}) && \
-                  export ECR_AUTH=$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
+                  export ECR_CRED=\$(aws ecr get-login-password --region ${region}) && \
+                  export ECR_AUTH=\$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
                   echo "{\"auths\":{\"${registry}\": {\"auth\": \"\$ECR_AUTH\"}}}" > /root/.docker/config.json
               """
             }
