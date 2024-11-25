@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-FROM public.ecr.aws/amazoncorretto/amazoncorretto:21-jdk as builder
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:21-al2023-jdk as builder
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
 RUN ./mvnw clean package
