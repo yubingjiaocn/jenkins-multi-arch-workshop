@@ -59,15 +59,15 @@ pipeline {
           script {
             container('awscli') {
               // Extract region and registry from ECR URL
-              def region = sh(script: "echo \${params.Repository} | cut -d'.' -f4", returnStdout: true).trim()
-              def registry = sh(script: "echo \${params.Repository} | cut -d'/' -f1", returnStdout: true).trim()
+              def region = sh(script: "echo \"${params.Repository}\" | cut -d'.' -f4", returnStdout: true).trim()
+              def registry = sh(script: "echo \"${params.Repository}\" | cut -d'/' -f1", returnStdout: true).trim()
 
               // Get ECR login password and create docker config
               sh """
-                mkdir -p /root/.docker
-                aws ecr get-login-password --region ${region} | \
-                python3 -c 'import sys, json; auth=sys.stdin.read().strip(); print(json.dumps({"auths": {"${registry}": {"auth": auth}}}))' \
-                > /root/.docker/config.json
+                  mkdir -p /root/.docker && \
+                  export ECR_CRED=$(aws ecr get-login-password --region ${region}) && \
+                  export ECR_AUTH=$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
+                  echo "{\"auths\":{\"${registry}\": {\"auth\": \"$ECR_AUTH\"}}}" > /root/.docker/config.json
               """
             }
 
