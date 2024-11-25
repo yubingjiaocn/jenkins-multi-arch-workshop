@@ -11,7 +11,7 @@ spec:
     kubernetes.io/arch: amd64
   containers:
   - name: manifest-tool
-    image: mplatform/manifest-tool
+    image: mplatform/manifest-tool:v2.1.8
     command:
     - cat
     tty: true
@@ -19,7 +19,7 @@ spec:
     - name: docker-config
       mountPath: /root/.docker
   - name: awscli
-    image: amazon/aws-cli
+    image: public.ecr.aws/aws-cli/aws-cli:2.22.4
     command:
     - cat
     tty: true
