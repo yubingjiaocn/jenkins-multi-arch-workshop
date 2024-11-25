@@ -48,10 +48,12 @@ pipeline {
       }
       steps {
         container('manifest-tool') {
-            sh 'docker-credential-ecr-login list'
-            sh 'chmod 700 ecrtodocker.sh'
-            sh './ecrtodocker.sh'
-            sh '/go/src/github.com/manifest-tool/manifest-tool push from-args --platforms linux/amd64,linux/arm64 --template 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-ARCHVARIANT --target 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1'
+            sh """
+              manifest-tool push from-args \
+              --platforms linux/amd64,linux/arm64 \
+              --template 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-ARCHVARIANT \
+              --target 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1
+            """
         }
       }
     }
