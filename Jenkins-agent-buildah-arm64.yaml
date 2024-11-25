@@ -17,8 +17,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kaniko
-  namespace: devops-tools
+  name: buildah-arm64
+  namespace: jenkins
 spec:
   serviceAccountName: jenkins
   nodeSelector:

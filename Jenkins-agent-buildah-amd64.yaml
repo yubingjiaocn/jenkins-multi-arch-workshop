@@ -17,8 +17,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kaniko
-  namespace: devops-tools
+  name: buildah-amd64
+  namespace: jenkins
 spec:
   securityContext:
     fsGroup: 1000
