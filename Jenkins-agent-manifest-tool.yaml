@@ -13,20 +13,18 @@ spec:
   - name: manifest-tool
     image: mplatform/manifest-tool:v2.1.8
     command:
-      - sleep
+    - sleep
     args:
-      - 99d
-    tty: true
+    - 99d
     volumeMounts:
     - name: docker-config
       mountPath: /root/.docker
   - name: awscli
     image: public.ecr.aws/aws-cli/aws-cli:2.22.4
     command:
-      - sleep
+    - sleep
     args:
-      - 99d
-    tty: true
+    - 99d
     volumeMounts:
     - name: docker-config
       mountPath: /root/.docker

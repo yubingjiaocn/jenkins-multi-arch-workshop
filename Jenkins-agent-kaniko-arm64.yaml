@@ -14,13 +14,12 @@ spec:
     image: gcr.io/kaniko-project/executor:v1.23.2
     imagePullPolicy: Always
     command:
-      - sleep
+    - sleep
     args:
-      - 99d
-    tty: true
+    - 99d
     volumeMounts:
-      - name: docker-config
-        mountPath: /kaniko/.docker/
-  volumes:
     - name: docker-config
-      emptyDir: {}
+      mountPath: /kaniko/.docker/
+  volumes:
+  - name: docker-config
+    emptyDir: {}
