@@ -4,8 +4,6 @@ metadata:
   name: kaniko-amd64
   namespace: jenkins
 spec:
-  securityContext:
-    fsGroup: 1000
   serviceAccountName: jenkins
   nodeSelector:
     kubernetes.io/arch: amd64
@@ -19,4 +17,10 @@ spec:
         - sleep
       args:
         - 99d
+      volumeMounts:
+      - name: docker-config
+        mountPath: /kaniko/.docker/
   restartPolicy: Never
+  volumes:
+  - name: docker-config
+    emptyDir: {}
