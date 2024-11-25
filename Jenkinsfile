@@ -74,8 +74,8 @@ pipeline {
               sh """
                   mkdir -p /root/.docker && \
                   export ECR_CRED=\$(aws ecr get-login-password --region us-west-2) && \
-                  export ECR_AUTH=\$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
-                  echo "{\"auths\":{\"600413481647.dkr.ecr.us-west-2.amazonaws.com\": {\"auth\": \"$ECR_AUTH\"}}}" > /root/.docker/config.json && \
+                  export ECR_AUTH=\$(echo -n \"AWS:\$ECR_CRED\" | base64 -w 0) && \
+                  echo "{\"auths\":{\"600413481647.dkr.ecr.us-west-2.amazonaws.com\": {\"auth\": \"\$ECR_AUTH\"}}}" > /root/.docker/config.json && \
                   cat /root/.docker/config.json
               """
             }
