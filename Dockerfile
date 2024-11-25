@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/maven:3.5-jdk-8-alpine AS builder
+FROM public.ecr.aws/docker/library/maven:3.9-amazoncorretto-8-al2023 AS builder
 WORKDIR /app
 COPY src/ /app/src
 COPY pom.xml /app/pom.xml
