@@ -71,13 +71,26 @@ pipeline {
               """ */
 
               // Temporary hardcode something...
-              sh """
-                  mkdir -p /root/.docker && \
-                  export ECR_CRED=\$(aws ecr get-login-password --region us-west-2) && \
-                  export ECR_AUTH=\$(echo -n \"AWS:\$ECR_CRED\" | base64 -w 0) && \
-                  echo "{\"auths\":{\"600413481647.dkr.ecr.us-west-2.amazonaws.com\": {\"auth\": \"\$ECR_AUTH\"}}}" > /root/.docker/config.json && \
-                  cat /root/.docker/config.json
-              """
+              sh 'mkdir -p /root/.docker'
+
+              // Get ECR login password and encode it for Docker config
+              def ecrCred = sh(script: 'aws ecr get-login-password --region us-west-2', returnStdout: true).trim()
+              def ecrAuth = "AWS:${ecrCred}".bytes.encodeBase64().toString()
+
+              // Create Docker config.json with the ECR authentication
+              def configJson = """{
+                  "auths": {
+                      "600413481647.dkr.ecr.us-west-2.amazonaws.com": {
+                          "auth": "${ecrAuth}"
+                      }
+                  }
+              }"""
+
+              // Write the config.json to the .docker directory
+              writeFile(file: '/root/.docker/config.json', text: configJson)
+
+              // Output the contents of config.json for verification
+              sh 'cat /root/.docker/config.json'
             }
 
             container('manifest-tool') {
