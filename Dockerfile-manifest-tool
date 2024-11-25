@@ -3,4 +3,4 @@ RUN wget https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.co
     mv docker-credential-ecr-login /usr/local/bin/ && \
     chmod 777 /usr/local/bin/docker-credential-ecr-login && \
     mkdir -p $HOME/.docker && \
-    echo "{\"credsStore\": \"ecr-login\"}"
+    echo "{\"credsStore\": \"ecr-login\"}" > $HOME/.docker/config.json
