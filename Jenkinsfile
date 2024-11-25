@@ -1,7 +1,7 @@
 pipeline {
     agent none
     parameters {
-        string(name: 'Repository', description: 'Repository with registry for container image')
+        string(name: 'Repository', defaultValue: '600413481647.dkr.ecr.us-west-2.amazonaws.com/jpetstore', description: 'Repository with registry for container image')
         string(name: 'Tag', defaultValue: 'v1.0.0', description: 'Tag for container image')
     }
     stages {
@@ -58,7 +58,7 @@ pipeline {
         steps {
           script {
             container('awscli') {
-              // Extract region and registry from ECR URL
+/*            // Extract region and registry from ECR URL
               def region = sh(script: "echo \"${params.Repository}\" | cut -d'.' -f4", returnStdout: true).trim()
               def registry = sh(script: "echo \"${params.Repository}\" | cut -d'/' -f1", returnStdout: true).trim()
 
@@ -68,6 +68,15 @@ pipeline {
                   export ECR_CRED=\$(aws ecr get-login-password --region ${region}) && \
                   export ECR_AUTH=\$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
                   echo "{\"auths\":{\"${registry}\": {\"auth\": \"\$ECR_AUTH\"}}}" > /root/.docker/config.json
+              """ */
+
+              // Temporary hardcode something...
+              sh """
+                  mkdir -p /root/.docker && \
+                  export ECR_CRED=\$(aws ecr get-login-password --region us-west-2) && \
+                  export ECR_AUTH=\$(echo -n \"AWS:$ECR_CRED\" | base64 -w 0) && \
+                  echo "{\"auths\":{\"600413481647.dkr.ecr.us-west-2.amazonaws.com\": {\"auth\": \"$ECR_AUTH\"}}}" > /root/.docker/config.json && \
+                  cat /root/.docker/config.json
               """
             }
 
