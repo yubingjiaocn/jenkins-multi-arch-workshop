@@ -1,0 +1,49 @@
+  pipeline {
+    agent none
+    stages {
+      stage('Build'){
+        parallel {
+          stage("Build for AMD64 platform") {
+              agent {
+                 kubernetes {
+                   yamlFile 'Jenkins-kaniko-amd64.yaml'
+                 }
+              }
+              steps {
+                container('kaniko') {
+                   sh '/kaniko/executor --context `pwd` --dockerfile `pwd`/Dockerfile --destination 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-amd64'
+                }
+              }
+            }
+          stage("Build for ARM64 platform") {
+              agent {
+                 kubernetes {
+                   yamlFile 'Jenkins-kaniko-arm64.yaml'
+                 }
+              }
+              steps {
+                container('kaniko') {
+                   sh '/kaniko/executor --context `pwd` --dockerfile `pwd`/Dockerfile --destination 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-arm64'
+                }
+              }
+          }
+        }
+      }
+
+      stage('Manifest'){
+        agent {
+             kubernetes {
+               yamlFile 'Jenkins-manifest-tool.yaml'
+             }
+        }
+        steps {
+          container('manifest-tool') {
+             sh 'docker-credential-ecr-login list'
+             sh 'chmod 700 ecrtodocker.sh'
+             sh './ecrtodocker.sh'
+             sh '/go/src/github.com/manifest-tool/manifest-tool push from-args --platforms linux/amd64,linux/arm64 --template 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-ARCHVARIANT --target 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1'
+          }
+        }
+      }
+    }
+}
