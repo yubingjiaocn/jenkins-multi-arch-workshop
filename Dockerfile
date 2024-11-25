@@ -17,7 +17,7 @@
 FROM public.ecr.aws/docker/library/maven:3.9.9-amazoncorretto-21-al2023 AS builder
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
-RUN ["/bin/sh", "-c", "mvn", "-B", "--no-transfer-progress", "clean", "package"]
+RUN ["/bin/sh", "-c", "mvn --no-transfer-progress clean package"]
 
 FROM public.ecr.aws/docker/library/tomcat:9-jre21 AS runner
 COPY --from=builder /usr/src/myapp/target/jpetstore.war /usr/local/tomcat/webapps/
