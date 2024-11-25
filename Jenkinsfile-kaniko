@@ -14,7 +14,7 @@ pipeline {
                   sh """
                     /kaniko/executor --context . \
                                    --dockerfile Dockerfile \
-                                   --customPlatform linux/amd64 \
+                                   --custom-platform linux/amd64 \
                                    --destination 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-amd64
                   """
               }
@@ -31,7 +31,7 @@ pipeline {
                   sh """
                     /kaniko/executor --context . \
                                    --dockerfile Dockerfile \
-                                   --customPlatform linux/arm64 \
+                                   --custom-platform linux/arm64 \
                                    --destination 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1-arm64
                   """
               }
