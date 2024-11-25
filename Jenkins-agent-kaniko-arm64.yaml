@@ -11,7 +11,7 @@ spec:
     kubernetes.io/arch: arm64
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:v1.23.2
+    image: gcr.io/kaniko-project/executor:v1.23.2-debug
     imagePullPolicy: Always
     command:
     - sleep
