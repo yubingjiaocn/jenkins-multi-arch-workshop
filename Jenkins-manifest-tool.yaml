@@ -7,7 +7,7 @@ spec:
   serviceAccountName: jenkins
   containers:
     - name: manifest-tool
-      image: gaussye/manifest-tool:latest
+      image: 600413481647.dkr.ecr.us-west-2.amazonaws.com/manifest-tool:2.1.8-ecr
       command:
         - sleep
       args:
