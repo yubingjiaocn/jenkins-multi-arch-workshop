@@ -27,7 +27,7 @@ spec:
     - 99d
     volumeMounts:
     - name: docker-config
-      mountPath: /root/.docker
+      mountPath: /tmp/.docker
   volumes:
   - name: docker-config
     emptyDir: {}

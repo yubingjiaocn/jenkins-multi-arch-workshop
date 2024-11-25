@@ -71,11 +71,11 @@ pipeline {
               """ */
 
               // Temporary hardcode something...
-              sh 'mkdir -p /root/.docker'
+              sh 'mkdir -p /tmp/.docker'
 
               // Get ECR login password and encode it for Docker config
               def ecrCred = sh(script: 'aws ecr get-login-password --region us-west-2', returnStdout: true).trim()
-              def ecrAuth = "AWS:${ecrCred}".bytes.encodeBase64().toString()
+              def ecrAuth = sh(script: "echo -n \"AWS:${ecrCred}\" | base64 -w 0", returnStdout: true).trim()
 
               // Create Docker config.json with the ECR authentication
               def configJson = """{
@@ -87,10 +87,10 @@ pipeline {
               }"""
 
               // Write the config.json to the .docker directory
-              writeFile(file: '/root/.docker/config.json', text: configJson)
+              writeFile(file: '/tmp/.docker/config.json', text: configJson)
 
               // Output the contents of config.json for verification
-              sh 'cat /root/.docker/config.json'
+              sh 'cat /tmp/.docker/config.json'
             }
 
             container('manifest-tool') {
