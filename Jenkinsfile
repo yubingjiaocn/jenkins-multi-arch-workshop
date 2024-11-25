@@ -5,34 +5,23 @@ pipeline {
         string(name: 'Tag', defaultValue: 'v1.0.0', description: 'Tag for container image')
     }
     stages {
-      stage('Get ECR Token') {
-        agent {
-          kubernetes {
-            yamlFile 'Jenkins-agent-awscli-arm64.yaml'
-          }
-        }
-        steps {
-          script {
-            container('awscli') {
-              def creds = sh 'aws ecr get-login-password --region us-west-2'
-            }
-          }
-        }
-      }
-
       stage('Build') {
         parallel {
           stage('Build for arm64 platform') {
             agent {
               kubernetes {
-                yamlFile 'Jenkins-agent-buildah-arm64.yaml'
+                yamlFile 'Jenkins-agent-kaniko-arm64.yaml'
               }
             }
             steps {
               script {
-                container('buildah') {
-                  sh "buildah build --pull --platform linux/arm64 -t ${params.Repository}:${params.Tag}-arm64"
-                  sh "buildah push ${params.Repository}:${params.Tag}-arm64 docker://${params.Repository}:${params.Tag}-arm64 --creds AWS:${creds}"
+                container('kaniko') {
+                  sh """
+                    /kaniko/executor --context . \
+                                   --dockerfile Dockerfile \
+                                   --customPlatform linux/arm64 \
+                                   --destination ${params.Repository}:${params.Tag}-arm64
+                  """
                 }
               }
             }
@@ -41,34 +30,55 @@ pipeline {
           stage('Build for amd64 platform') {
             agent {
               kubernetes {
-                yamlFile 'Jenkins-agent-buildah-amd64.yaml'
+                yamlFile 'Jenkins-agent-kaniko-amd64.yaml'
               }
             }
             steps {
               script {
-                container('buildah') {
-                  sh "buildah build --pull --platform linux/amd64 -t ${params.Repository}:${params.Tag}-amd64"
-                  sh "buildah push ${params.Repository}:${params.Tag}-amd64 docker://${params.Repository}:${params.Tag}-amd64 --creds AWS:${creds}"
+                container('kaniko') {
+                  sh """
+                    /kaniko/executor --context . \
+                                   --dockerfile Dockerfile \
+                                   --customPlatform linux/amd64 \
+                                   --destination ${params.Repository}:${params.Tag}-amd64
+                  """
                 }
               }
             }
           }
         }
-        }
+      }
 
-      stage('Manifest') {
+      stage('Create Manifest') {
         agent {
           kubernetes {
-            yamlFile 'Jenkins-agent-buildah-arm64.yaml'
+            yamlFile 'Jenkins-agent-manifest-tool.yaml'
           }
         }
         steps {
           script {
-            container('buildah') {
-              sh "buildah manifest create ${params.Repository}:${params.Tag} \
-                      ${params.Repository}:${params.Tag}-arm64 \
-                      ${params.Repository}:${params.Tag}-amd64"
-              sh "buildah manifest push ${params.Repository}:${params.Tag} docker://${params.Repository}:${params.Tag} --creds AWS:${creds}"
+            container('awscli') {
+              // Extract region and registry from ECR URL
+              def region = sh(script: "echo \${params.Repository} | cut -d'.' -f4", returnStdout: true).trim()
+              def registry = sh(script: "echo \${params.Repository} | cut -d'/' -f1", returnStdout: true).trim()
+
+              // Get ECR login password and create docker config
+              sh """
+                mkdir -p /root/.docker
+                aws ecr get-login-password --region ${region} | \
+                python3 -c 'import sys, json; auth=sys.stdin.read().strip(); print(json.dumps({"auths": {"${registry}": {"auth": auth}}}))' \
+                > /root/.docker/config.json
+              """
+            }
+
+            container('manifest-tool') {
+              // Create and push manifest using manifest-tool
+              sh """
+                manifest-tool push from-args \
+                  --platforms linux/amd64,linux/arm64 \
+                  --template ${params.Repository}:${params.Tag}-ARCH \
+                  --target ${params.Repository}:${params.Tag}
+              """
             }
           }
         }
