@@ -14,7 +14,7 @@ pipeline {
                 }
             }
             steps {
-              docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:your-credentials-id") {
+              docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:IAMRole") {
                 container('buildah') {
                     sh 'buildah build --pull --platform linux/arm64 -t ${params.Repository}:${params.Tag}-arm64'
                     sh 'buildah push ${params.Repository}:${params.Tag}-arm64 docker://${params.Repository}:${params.Tag}-arm64'
@@ -29,7 +29,7 @@ pipeline {
                 }
             }
             steps {
-              docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:your-credentials-id") {
+              docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:IAMRole") {
                 container('buildah') {
                     sh 'buildah build --pull --platform linux/amd64 -t ${params.Repository}:${params.Tag}-amd64'
                     sh 'buildah push ${params.Repository}:${params.Tag}-amd64 docker://${params.Repository}:${params.Tag}-amd64'
@@ -47,7 +47,7 @@ pipeline {
             }
       }
       steps {
-        docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:your-credentials-id") {
+        docker.withRegistry("https://${params.Repository}", "ecr:us-west-2:IAMRole") {
           container('buildah') {
               sh 'buildah manifest create ${params.Repository}:${params.Tag} \
                   ${params.Repository}:${params.Tag}-arm64 \
