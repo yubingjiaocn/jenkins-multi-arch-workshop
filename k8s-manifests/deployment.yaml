@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-arch-demo
+  labels:
+    app: multi-arch-demo
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: multi-arch-demo
+  template:
+    metadata:
+      labels:
+        app: multi-arch-demo
+    spec:
+      nodeSelector:
+        purpose: demo
+      containers:
+      - name: multi-arch-demo
+        image: 600413481647.dkr.ecr.us-west-2.amazonaws.com/multi-arch-demo:v0.0.1
+        ports:
+        - containerPort: 8989
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
